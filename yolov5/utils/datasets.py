@@ -210,6 +210,11 @@ class LoadImages:
     def __iter__(self):
         self.count = 0
         return self
+      
+    @staticmethod
+    def get_hms(millis):
+        hms = timedelta(milliseconds=millis)
+        return hms
 
     def __next__(self):
         if self.count == self.nf:
@@ -232,6 +237,7 @@ class LoadImages:
 
             self.frame += 1
             s = f'video {self.count + 1}/{self.nf} ({self.frame}/{self.frames}) {path}: '
+            timestamp = self.get_hms(self.cap.get(cv2.CAP_PROP_POS_MSEC))
 
         else:
             # Read image
@@ -246,8 +252,11 @@ class LoadImages:
         # Convert
         img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
         img = np.ascontiguousarray(img)
-
-        return path, img, img0, self.cap, s
+        
+        if self.mode == "video":
+            return path, img, img0, self.cap, s, timestamp
+        else:
+            return path, img, img0, self.cap, s
 
     def new_video(self, path):
         self.frame = 0
