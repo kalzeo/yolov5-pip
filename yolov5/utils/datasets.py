@@ -238,7 +238,14 @@ class LoadImages:
 
             self.frame += 1
             s = f'video {self.count + 1}/{self.nf} ({self.frame}/{self.frames}) {path}: '
-            timestamp = self.get_hms(self.cap.get(cv2.CAP_PROP_POS_MSEC))
+            
+            duration = self.cap.get(cv2.CAP_PROP_POS_MSEC)
+            fps = self.cap.get(cv2.CAP_PROP_FPS)
+            
+            if duration == 0.0:
+                timestamp = self.get_hms((self.frame / fps) * 1000)
+            else:
+                timestamp = self.get_hms(duration)
 
         else:
             # Read image
